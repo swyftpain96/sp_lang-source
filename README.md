@@ -29,6 +29,22 @@ Run it:
 
 ---
 
+## 🎨 VS Code Extension
+
+For the best development experience, including **syntax highlighting**, **IntelliSense**, and **type inference**, install the SP Language extension.
+
+### Manual Installation (VSIX)
+Since the extension is currently in early development, you can install it manually:
+
+1. Download the latest `.vsix` file: **[sp-language-vscode-0.1.5.vsix](sp_language-vscode/sp-language-vscode-0.1.5.vsix)**.
+2. Open VS Code.
+3. Open the **Extensions** view (`Ctrl+Shift+X`).
+4. Click the `...` (More Actions) menu in the top-right corner of the Extensions view.
+5. Select **Install from VSIX...**.
+6. Choose the downloaded `.vsix` file.
+
+---
+
 For more technical details, check out:
 - 📘 **[Language Guide](LANGUAGE_GUIDE.md)**: Syntax, built-in modules, and core features.
 - 🧩 **[Native Addons Guide](NATIVE_ADDONS_GUIDE.md)**: Building high-performance extensions in C++, Zig, Rust, and more.
