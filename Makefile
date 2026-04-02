@@ -5,7 +5,7 @@ SRCS = main.cpp lexer.cpp parser.cpp interpreter.cpp types.cpp resolver.cpp comp
 OBJS = $(SRCS:.cpp=.o)
 
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -static -o $(TARGET) $(OBJS) -ldl
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(TARGET) $(OBJS) -ldl
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

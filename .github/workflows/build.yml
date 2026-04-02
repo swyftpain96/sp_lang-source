@@ -11,17 +11,18 @@ jobs:
     name: Build for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
             artifact_name: sp-linux
-            binary_name: sp
+            ldflags: "-static"
           - os: macos-latest
             artifact_name: sp-macos
-            binary_name: sp
+            ldflags: ""
           - os: windows-latest
             artifact_name: sp-windows
-            binary_name: sp.exe
+            ldflags: "-static"
 
     steps:
       - name: Checkout code
@@ -40,16 +41,16 @@ jobs:
           install: |
             mingw-w64-x86_64-toolchain
             make
-          update: true
+          update: false
 
       - name: Build (Linux/macOS)
         if: matrix.os != 'windows-latest'
-        run: make
+        run: make LDFLAGS="${{ matrix.ldflags }}"
 
       - name: Build (Windows)
         if: matrix.os == 'windows-latest'
         shell: msys2 {0}
-        run: make CXX=g++ CXXFLAGS="-std=c++17 -Wall -Wextra -O3 -flto=auto -static"
+        run: make CXX=g++ CXXFLAGS="-std=c++17 -Wall -Wextra -O3 -flto=auto" LDFLAGS="${{ matrix.ldflags }}"
 
       - name: Prepare Binary for Artifact
         shell: bash
