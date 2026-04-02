@@ -61,4 +61,21 @@ For more technical details, check out:
 
 ---
 
+## 🛠️ Building from Source
+
+To build SP from source, you need a C++17 compatible compiler and `make`.
+
+### 1. Prerequisites
+- **Linux**: `build-essential` (gcc/g++)
+- **macOS**: Xcode Command Line Tools
+- **Windows**: MinGW-w64 (msys2 recommended)
+
+### 2. Build
+```bash
+make
+```
+This will produce a statically linked `sp` (or `sp.exe`) binary in the root directory.
+
+---
+
 Happy Coding with **SP**!
