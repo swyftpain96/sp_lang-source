@@ -684,7 +684,7 @@ Value MemberExpression::evaluate(Interpreter& interpreter) {
             })));
         }
         if (property == "clear") {
-            return Value(interpreter.makeFunction(std::make_shared<NativeFunction>([m](Interpreter&, const std::vector<Value>& args) {
+            return Value(interpreter.makeFunction(std::make_shared<NativeFunction>([m](Interpreter&, const std::vector<Value>&) {
                 m->map.clear();
                 return Value(Type::UNDEFINED);
             })));

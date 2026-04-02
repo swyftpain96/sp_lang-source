@@ -201,6 +201,7 @@ Value Value::operator+(const Value& other) const {
 }
 
 Value SpClass::call(Interpreter& interpreter, const std::vector<Value>& args) {
+    (void)args;
     if (isAbstract) throw std::runtime_error("Cannot instantiate abstract class '" + name + "'");
     auto instance = std::make_shared<SpInstance>(this);
     Value::registerInstance(instance);

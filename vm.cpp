@@ -8,8 +8,26 @@
 #include <fstream>
 #include <filesystem>
 #ifdef _WIN32
+#include <windows.h>
 #define popen _popen
 #define pclose _pclose
+#define RTLD_NOW 0
+static void* dlopen(const char* filename, int) {
+    return (void*)LoadLibraryA(filename);
+}
+static void* dlsym(void* handle, const char* symbol) {
+    return (void*)GetProcAddress((HMODULE)handle, symbol);
+}
+static int dlclose(void* handle) {
+    return FreeLibrary((HMODULE)handle) ? 0 : -1;
+}
+static const char* dlerror() {
+    static char buf[256];
+    FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        buf, (sizeof(buf) / sizeof(char)), NULL);
+    return buf;
+}
 #else
 #include <dlfcn.h>
 #include <libgen.h>
@@ -64,6 +82,7 @@ void VM::defineGlobal(const std::string& name, Value val) {
 }
 
 static Value sp_get_property(Interpreter& interpreter, Value objVal, const std::string& property) {
+    (void)interpreter;
     if (objVal.isArray()) {
         auto* arr = objVal.asArray();
         if (property == "length") return Value((double)arr->size());
