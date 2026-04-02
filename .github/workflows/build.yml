@@ -1,0 +1,58 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: sp-linux
+            asset_name: sp
+          - os: macos-latest
+            artifact_name: sp-macos
+            asset_name: sp
+          - os: windows-latest
+            artifact_name: sp-windows
+            asset_name: sp.exe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Build Environment (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
+
+      - name: Setup Build Environment (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: msys2/setup-msys2@v2
+        with:
+          install: |
+            mingw-w64-x86_64-toolchain
+            make
+          update: true
+
+      - name: Build (Linux/macOS)
+        if: matrix.os != 'windows-latest'
+        run: make
+
+      - name: Build (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: msys2 {0}
+        run: make CXX=g++ CXXFLAGS="-std=c++17 -Wall -Wextra -O3 -flto=auto -static"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.asset_name }}
