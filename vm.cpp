@@ -6,13 +6,21 @@
 #include <cmath>
 #include <cstdio>
 #include <fstream>
+#include <filesystem>
+#ifdef _WIN32
+#define popen _popen
+#define pclose _pclose
+#else
 #include <dlfcn.h>
-#include <cstdlib>
 #include <libgen.h>
+#endif
+#include <cstdlib>
 #include <sstream>
 #include <iomanip>
 #include <functional>
 #include <sys/stat.h>
+
+namespace fs = std::filesystem;
 
 VM::VM() {
     stack = std::make_unique<Value[]>(STACK_MAX);
@@ -1150,19 +1158,16 @@ void VM::run(VMFunction* mainFunction, Interpreter& interpreter) {
                 }
                 std::string pathStr = *pathVal.asString();
 
-                char* absPath = realpath(pathStr.c_str(), NULL);
-                std::string absPathStr = absPath ? absPath : pathStr;
-                if (absPath) free(absPath);
+                std::string absPathStr;
+                try {
+                    absPathStr = fs::absolute(pathStr).string();
+                } catch (...) {
+                    absPathStr = pathStr;
+                }
 
-                char* pathCStr = strdup(absPathStr.c_str());
-                char* dname = dirname(pathCStr);
-                std::string dirStr(dname);
-                free(pathCStr);
-
-                pathCStr = strdup(absPathStr.c_str());
-                char* bname = basename(pathCStr);
-                std::string nameStr(bname);
-                free(pathCStr);
+                fs::path p(absPathStr);
+                std::string dirStr = p.parent_path().string();
+                std::string nameStr = p.filename().string();
 
                 std::string extStr = "";
                 size_t dotPos = nameStr.find_last_of('.');

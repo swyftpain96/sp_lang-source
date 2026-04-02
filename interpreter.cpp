@@ -15,15 +15,21 @@
 #include <algorithm>
 #include <iomanip>
 #include <cstdio>
-#ifndef _WIN32
+#include <filesystem>
+#ifdef _WIN32
+#define popen _popen
+#define pclose _pclose
+#else
 #include <sys/wait.h>
+#include <libgen.h>
 #endif
 #include <climits>
 #include <cstdlib>
-#include <libgen.h>
 #include <sys/stat.h>
 #include <ctime>
 #include <unordered_set>
+
+namespace fs = std::filesystem;
 
 Value SpFunction::call(Interpreter& interpreter, const std::vector<Value>& args) {
     auto env = std::make_shared<Environment>(declaration.localCount, closure);
@@ -1152,19 +1158,16 @@ Value FSInfoExpression::evaluate(Interpreter& interpreter) {
     if (!pathVal.isString()) throw std::runtime_error("fs.info requires string path.");
     std::string pathStr = *pathVal.asString();
     
-    char* absPath = realpath(pathStr.c_str(), NULL);
-    std::string absPathStr = absPath ? absPath : pathStr;
-    if (absPath) free(absPath);
+    std::string absPathStr;
+    try {
+        absPathStr = fs::absolute(pathStr).string();
+    } catch (...) {
+        absPathStr = pathStr;
+    }
 
-    char* pathCStr = strdup(absPathStr.c_str());
-    char* dname = dirname(pathCStr);
-    std::string dirStr(dname);
-    free(pathCStr);
-
-    pathCStr = strdup(absPathStr.c_str());
-    char* bname = basename(pathCStr);
-    std::string nameStr(bname);
-    free(pathCStr);
+    fs::path p(absPathStr);
+    std::string dirStr = p.parent_path().string();
+    std::string nameStr = p.filename().string();
 
     std::string extStr = "";
     size_t dotPos = nameStr.find_last_of('.');

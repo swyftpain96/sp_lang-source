@@ -512,12 +512,22 @@ Transpiler::transpile(const std::vector<std::shared_ptr<Statement>> &ast) {
   finalCode << "    }\n";
   finalCode << "    std::array<char, 128> buffer;\n";
   finalCode << "    std::string result;\n";
-  finalCode << "    FILE* pipe = popen((fullCmd + \" 2>&1\").c_str(), \"r\");\n";
+  finalCode << "    FILE* pipe;\n";
+  finalCode << "#ifdef _WIN32\n";
+  finalCode << "    pipe = _popen((fullCmd + \" 2>&1\").c_str(), \"r\");\n";
+  finalCode << "#else\n";
+  finalCode << "    pipe = popen((fullCmd + \" 2>&1\").c_str(), \"r\");\n";
+  finalCode << "#endif\n";
   finalCode << "    if (!pipe) return makeProcessResult(\"\", 1);\n";
   finalCode << "    while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {\n";
   finalCode << "        result += buffer.data();\n";
   finalCode << "    }\n";
-  finalCode << "    int status = pclose(pipe);\n";
+  finalCode << "    int status;\n";
+  finalCode << "#ifdef _WIN32\n";
+  finalCode << "    status = _pclose(pipe);\n";
+  finalCode << "#else\n";
+  finalCode << "    status = pclose(pipe);\n";
+  finalCode << "#endif\n";
   finalCode << "    return makeProcessResult(result, status);\n";
   finalCode << "}\n\n";
 
