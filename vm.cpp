@@ -18,10 +18,10 @@ static void* dlopen(const char* filename, int) {
 static void* dlsym(void* handle, const char* symbol) {
     return (void*)GetProcAddress((HMODULE)handle, symbol);
 }
-static int dlclose(void* handle) {
+[[maybe_unused]] static int dlclose(void* handle) {
     return FreeLibrary((HMODULE)handle) ? 0 : -1;
 }
-static const char* dlerror() {
+[[maybe_unused]] static const char* dlerror() {
     static char buf[256];
     FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),

@@ -657,7 +657,7 @@ static std::string escapeString(const std::string &s) {
 
 std::string Transpiler::generateExpression(Expression *expr,
                                            std::ostringstream &outStream) {
-  if (auto e = dynamic_cast<ThisExpression *>(expr)) {
+  if (dynamic_cast<ThisExpression *>(expr)) {
       return "sp_this";
   }
   if (auto e = dynamic_cast<LiteralExpression *>(expr)) {
