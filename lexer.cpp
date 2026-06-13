@@ -12,8 +12,8 @@ std::vector<Token> Lexer::tokenize() {
         char c = peek();
         if (isdigit(c)) {
             tokens.push_back(number());
-        } else if (c == '"') {
-            tokens.push_back(string());
+        } else if (c == '"' || c == '\'') {
+            tokens.push_back(string(c));
         } else if (isalpha(c) || c == '_') {
             tokens.push_back(identifier());
         } else {
@@ -161,16 +161,16 @@ Token Lexer::number() {
     return {TokenType::NUMBER, val, line};
 }
 
-Token Lexer::string() {
-    advance(); // skip opening "
+Token Lexer::string(char quote) {
+    advance(); // skip opening quote
     std::string val = "";
     while (pos < source.size()) {
         if (source[pos] == '\\' && pos + 1 < source.size()) {
             char next = source[pos + 1];
-            if (next == '"' || next == '\\' || next == 'n' || next == 'r' || next == 't') {
+            if (next == quote || next == '\\' || next == 'n' || next == 'r' || next == 't') {
                 advance(); // Skip backslash character
                 char esc = advance();
-                if (esc == '"') val += '"';
+                if (esc == quote) val += quote;
                 else if (esc == '\\') val += '\\';
                 else if (esc == 'n') val += '\n';
                 else if (esc == 'r') val += '\r';
@@ -180,14 +180,14 @@ Token Lexer::string() {
                 val += advance();
                 val += advance();
             }
-        } else if (source[pos] == '"') {
+        } else if (source[pos] == quote) {
             break;
         } else {
             if (source[pos] == '\n') line++;
             val += advance();
         }
     }
-    if (pos < source.size()) advance(); // skip closing "
+    if (pos < source.size()) advance(); // skip closing quote
     return {TokenType::STRING, val, line};
 }
 

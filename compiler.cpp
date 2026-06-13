@@ -398,8 +398,7 @@ void Compiler::compile(std::shared_ptr<Expression> expr) {
             emitConstant(e->value);
         }
     } else if (auto e = dynamic_cast<BigIntLiteralExpression*>(expr.get())) {
-        int64_t val = std::stoll(e->value);
-        auto ptr = std::make_shared<int64_t>(val);
+        auto ptr = std::make_shared<BigInt>(e->value);
         Value::registerBigInt(ptr);
         emitConstant(Value(ptr.get()));
     } else if (auto e = dynamic_cast<IdentifierExpression*>(expr.get())) {

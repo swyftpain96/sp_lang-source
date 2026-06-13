@@ -878,12 +878,41 @@ std::shared_ptr<Expression> Parser::parseInterpolatedString(const std::string& v
     }
 
     size_t braceClose = std::string::npos;
+    int nestedDepth = 0;
+    char quote = '\0';
+    bool escaped = false;
     for (size_t i = braceOpen + 1; i < val.size(); ++i) {
-        if (val[i] == '}') {
-            if (val[i-1] != '\\') {
+        char ch = val[i];
+        if (escaped) {
+            escaped = false;
+            continue;
+        }
+        if (quote != '\0') {
+            if (ch == '\\') {
+                escaped = true;
+            } else if (ch == quote) {
+                quote = '\0';
+            }
+            continue;
+        }
+        if (ch == '"' || ch == '\'') {
+            quote = ch;
+            continue;
+        }
+        if (ch == '(' || ch == '[' || ch == '{') {
+            nestedDepth++;
+            continue;
+        }
+        if (ch == ')' || ch == ']') {
+            if (nestedDepth > 0) nestedDepth--;
+            continue;
+        }
+        if (ch == '}') {
+            if (nestedDepth == 0) {
                 braceClose = i;
                 break;
             }
+            nestedDepth--;
         }
     }
     if (braceClose == std::string::npos) {

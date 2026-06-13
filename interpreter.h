@@ -128,7 +128,7 @@ public:
     Value evaluate(std::shared_ptr<Expression> expr);
     void execute(const Statement& stmt);
     std::string* makeString(const std::string& s);
-    int64_t* makeBigInt(int64_t v);
+    BigInt* makeBigInt(const BigInt& v);
     DateData* makeDate(double ts);
     MapData* makeMap();
     Value makeRegex(const std::string& pattern, const std::string& lastPart = "", bool isGlobal = false);

@@ -115,7 +115,7 @@ private:
     char advance();
     void skipWhitespace();
     Token number();
-    Token string();
+    Token string(char quote);
     Token identifier();
 };
 

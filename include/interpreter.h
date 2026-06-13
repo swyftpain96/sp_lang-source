@@ -109,7 +109,7 @@ public:
     Value evaluate(std::shared_ptr<Expression> expr);
     void execute(const Statement& stmt);
     std::string* makeString(const std::string& s);
-    int64_t* makeBigInt(int64_t v);
+    BigInt* makeBigInt(const BigInt& v);
     DateData* makeDate(double ts);
     MapData* makeMap();
 
@@ -119,7 +119,7 @@ public:
     std::vector<std::shared_ptr<std::string>> allStrings;
     std::vector<std::shared_ptr<std::vector<std::pair<std::string, Value>>>> allObjects;
     std::vector<std::shared_ptr<std::vector<Value>>> allArrays;
-    std::vector<std::shared_ptr<int64_t>> allBigInts;
+    std::vector<std::shared_ptr<BigInt>> allBigInts;
     std::vector<std::shared_ptr<DateData>> allDates;
     std::vector<std::shared_ptr<MapData>> allMaps;
     std::vector<std::shared_ptr<SpClass>> allClasses;

@@ -823,11 +823,11 @@ void VM::runLoop(int stopFrameIndex, Interpreter& interpreter) {
                 int count = READ_BYTE();
                 auto obj = std::make_shared<std::vector<std::pair<std::string, Value>>>();
                 Value::registerObject(obj);
-                obj->reserve(count);
+                obj->resize(count);
                 for (int i = count - 1; i >= 0; i--) {
                     Value val = *(--sp);
                     Value nameVal = *(--sp);
-                    obj->push_back({*nameVal.asString(), val});
+                    (*obj)[i] = {*nameVal.asString(), val};
                 }
                 *sp++ = Value(obj.get());
             }

@@ -11,6 +11,9 @@
 #include <stdexcept>
 #include <iostream>
 #include <functional>
+#include <boost/multiprecision/cpp_int.hpp>
+
+using BigInt = boost::multiprecision::cpp_int;
 
 class Expression;
 class Interpreter;
@@ -139,7 +142,7 @@ struct Value {
     Value(ICallable* f, bool isNative = false) : bits(VALUE_QNAN | (isNative ? TAG_NATIVE_FUNCTION : TAG_FUNCTION) | ((uint64_t)f & PAYLOAD_MASK)) {}
     Value(class SpClass* c) : bits(VALUE_QNAN | TAG_CLASS | ((uint64_t)c & PAYLOAD_MASK)) {}
     Value(class SpInstance* i) : bits(VALUE_QNAN | TAG_INSTANCE | ((uint64_t)i & PAYLOAD_MASK)) {}
-    Value(int64_t* b) : bits(VALUE_QNAN | TAG_BIGINT | ((uint64_t)b & PAYLOAD_MASK)) {}
+    Value(BigInt* b) : bits(VALUE_QNAN | TAG_BIGINT | ((uint64_t)b & PAYLOAD_MASK)) {}
     Value(DateData* d) : bits(VALUE_QNAN | TAG_DATE | ((uint64_t)d & PAYLOAD_MASK)) {}
     Value(MapData* m) : bits(VALUE_QNAN | TAG_MAP | ((uint64_t)m & PAYLOAD_MASK)) {}
     Value(class VMFunction* f) : bits(VALUE_QNAN | TAG_VM_FUNCTION | ((uint64_t)f & PAYLOAD_MASK)) {}
@@ -149,7 +152,7 @@ struct Value {
     static void registerString(std::shared_ptr<std::string> s);
     static void registerArray(std::shared_ptr<std::vector<Value>> a);
     static void registerObject(std::shared_ptr<std::vector<std::pair<std::string, Value>>> o);
-    static void registerBigInt(std::shared_ptr<int64_t> b);
+    static void registerBigInt(std::shared_ptr<BigInt> b);
     static void registerDate(std::shared_ptr<struct DateData> d);
     static void registerMap(std::shared_ptr<struct MapData> m);
     static void registerError(std::shared_ptr<struct ErrorData> e);
@@ -184,7 +187,7 @@ struct Value {
     inline ICallable* asFunction() const { return (ICallable*)(bits & PAYLOAD_MASK); }
     inline class SpClass* asClass() const { return (class SpClass*)(bits & PAYLOAD_MASK); }
     inline class SpInstance* asInstance() const { return (class SpInstance*)(bits & PAYLOAD_MASK); }
-    inline int64_t* asBigInt() const { return (int64_t*)(bits & PAYLOAD_MASK); }
+    inline BigInt* asBigInt() const { return (BigInt*)(bits & PAYLOAD_MASK); }
     inline DateData* asDate() const { return (DateData*)(bits & PAYLOAD_MASK); }
     inline MapData* asMap() const { return (MapData*)(bits & PAYLOAD_MASK); }
 

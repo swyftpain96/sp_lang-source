@@ -241,8 +241,8 @@ SpClass* Interpreter::makeClass(const std::string& name, bool isAbstract) {
     return cl.get();
 }
 
-int64_t* Interpreter::makeBigInt(int64_t v) {
-    auto b = std::make_shared<int64_t>(v);
+BigInt* Interpreter::makeBigInt(const BigInt& v) {
+    auto b = std::make_shared<BigInt>(v);
     Value::registerBigInt(b);
     return b.get();
 }
@@ -509,7 +509,7 @@ Value LiteralExpression::evaluate(Interpreter& interpreter) {
 }
 
 Value BigIntLiteralExpression::evaluate(Interpreter& interpreter) {
-    return Value(interpreter.makeBigInt(std::stoll(value)));
+    return Value(interpreter.makeBigInt(BigInt(value)));
 }
 
 Value AsExpression::evaluate(Interpreter& interpreter) {

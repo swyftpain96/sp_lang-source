@@ -25,7 +25,7 @@ void Value::registerObject(std::shared_ptr<std::vector<std::pair<std::string, Va
     GlobalHeap.allObjects.push_back(o);
 }
 
-void Value::registerBigInt(std::shared_ptr<int64_t> b) {
+void Value::registerBigInt(std::shared_ptr<BigInt> b) {
     std::lock_guard<std::recursive_mutex> lock(GlobalHeap.mutex);
     GlobalHeap.allBigInts.push_back(b);
 }
@@ -92,6 +92,7 @@ size_t ValueHash::operator()(const Value& v) const {
     if (v.isError()) return (size_t)v.bits;
     if (v.isNumber()) return std::hash<double>{}(v.asNumber());
     if (v.isString()) return std::hash<std::string>{}(*v.asString());
+    if (v.isBigInt()) return std::hash<std::string>{}(v.asBigInt()->str());
     return std::hash<uint64_t>{}(v.bits);
 }
 
@@ -150,7 +151,7 @@ std::string Value::toString() const {
         return res + prefix + "}" + suffix;
     }
     if (isFunction()) return prefix + "[function]" + suffix;
-    if (isBigInt()) return prefix + std::to_string(*asBigInt()) + "n" + suffix;
+    if (isBigInt()) return prefix + asBigInt()->str() + suffix;
     if (isDate()) {
         std::ostringstream oss;
         oss << "[Date " << (long long)asDate()->timestamp << "]";
@@ -207,7 +208,7 @@ std::string Value::toPureString() const {
         return res + "}";
     }
     if (isFunction()) return "[function]";
-    if (isBigInt()) return std::to_string(*asBigInt());
+    if (isBigInt()) return asBigInt()->str();
     if (isDate()) return std::to_string((long long)asDate()->timestamp);
     if (isMap()) return "[Map]";
     if (isError()) return "[Error: " + asError()->message + "]";
@@ -363,7 +364,7 @@ Value Value::getBuiltinMethod(const std::string& property, Interpreter& interp) 
     if (objVal.isNumber()) {
         if (property == "toBigInt") {
             return Value(interp.makeFunction(std::make_shared<NativeFunction>([objVal](Interpreter&, const std::vector<Value>&) {
-                auto b = std::make_shared<int64_t>((int64_t)objVal.asNumber());
+                auto b = std::make_shared<BigInt>((int64_t)objVal.asNumber());
                 Value::registerBigInt(b);
                 return Value(b.get());
             })));
@@ -375,7 +376,7 @@ Value Value::getBuiltinMethod(const std::string& property, Interpreter& interp) 
         if (property == "toBigInt") {
             return Value(interp.makeFunction(std::make_shared<NativeFunction>([s](Interpreter& interp, const std::vector<Value>&) {
                 try {
-                    auto b = std::make_shared<int64_t>(std::stoll(*s));
+                    auto b = std::make_shared<BigInt>(*s);
                     Value::registerBigInt(b);
                     return Value(b.get());
                 } catch (...) {
@@ -583,8 +584,8 @@ Value Value::getBuiltinMethod(const std::string& property, Interpreter& interp) 
 
 #include <cmath>
 
-static inline int64_t getInt64(const Value& v) {
-    return v.isBigInt() ? *v.asBigInt() : (int64_t)v.asNumber();
+static inline BigInt getBigInt(const Value& v) {
+    return v.isBigInt() ? *v.asBigInt() : BigInt((int64_t)v.asNumber());
 }
 
 static inline bool needsPromotion(double da, double db, double res) {
@@ -603,7 +604,7 @@ Value Value::operator+(const Value& other) const {
         return Value(s.get());
     }
     if (isBigInt() || other.isBigInt()) {
-        auto b = std::make_shared<int64_t>(getInt64(*this) + getInt64(other));
+        auto b = std::make_shared<BigInt>(getBigInt(*this) + getBigInt(other));
         registerBigInt(b);
         return Value(b.get());
     }
@@ -612,7 +613,7 @@ Value Value::operator+(const Value& other) const {
         double db = other.asNumber();
         double res = da + db;
         if (needsPromotion(da, db, res)) {
-            auto b = std::make_shared<int64_t>((int64_t)da + (int64_t)db);
+            auto b = std::make_shared<BigInt>(BigInt((int64_t)da) + BigInt((int64_t)db));
             registerBigInt(b);
             return Value(b.get());
         }
@@ -625,7 +626,7 @@ Value Value::operator-(const Value& other) const {
     if (isError()) return *this;
     if (other.isError()) return other;
     if (isBigInt() || other.isBigInt()) {
-        auto b = std::make_shared<int64_t>(getInt64(*this) - getInt64(other));
+        auto b = std::make_shared<BigInt>(getBigInt(*this) - getBigInt(other));
         registerBigInt(b);
         return Value(b.get());
     }
@@ -634,7 +635,7 @@ Value Value::operator-(const Value& other) const {
         double db = other.asNumber();
         double res = da - db;
         if (needsPromotion(da, db, res)) {
-            auto b = std::make_shared<int64_t>((int64_t)da - (int64_t)db);
+            auto b = std::make_shared<BigInt>(BigInt((int64_t)da) - BigInt((int64_t)db));
             registerBigInt(b);
             return Value(b.get());
         }
@@ -647,7 +648,7 @@ Value Value::operator*(const Value& other) const {
     if (isError()) return *this;
     if (other.isError()) return other;
     if (isBigInt() || other.isBigInt()) {
-        auto b = std::make_shared<int64_t>(getInt64(*this) * getInt64(other));
+        auto b = std::make_shared<BigInt>(getBigInt(*this) * getBigInt(other));
         registerBigInt(b);
         return Value(b.get());
     }
@@ -656,7 +657,7 @@ Value Value::operator*(const Value& other) const {
         double db = other.asNumber();
         double res = da * db;
         if (needsPromotion(da, db, res)) {
-            auto b = std::make_shared<int64_t>((int64_t)da * (int64_t)db);
+            auto b = std::make_shared<BigInt>(BigInt((int64_t)da) * BigInt((int64_t)db));
             registerBigInt(b);
             return Value(b.get());
         }
@@ -669,9 +670,9 @@ Value Value::operator/(const Value& other) const {
     if (isError()) return *this;
     if (other.isError()) return other;
     if (isBigInt() || other.isBigInt()) {
-        int64_t db = getInt64(other);
+        BigInt db = getBigInt(other);
         if (db == 0) throw std::runtime_error("Division by zero");
-        auto b = std::make_shared<int64_t>(getInt64(*this) / db);
+        auto b = std::make_shared<BigInt>(getBigInt(*this) / db);
         registerBigInt(b);
         return Value(b.get());
     }
@@ -681,7 +682,7 @@ Value Value::operator/(const Value& other) const {
         double da = asNumber();
         double res = da / db;
         if (needsPromotion(da, db, res)) {
-            auto b = std::make_shared<int64_t>((int64_t)da / (int64_t)db);
+            auto b = std::make_shared<BigInt>(BigInt((int64_t)da) / BigInt((int64_t)db));
             registerBigInt(b);
             return Value(b.get());
         }
@@ -694,9 +695,9 @@ Value Value::operator%(const Value& other) const {
     if (isError()) return *this;
     if (other.isError()) return other;
     if (isBigInt() || other.isBigInt()) {
-        int64_t db = getInt64(other);
+        BigInt db = getBigInt(other);
         if (db == 0) throw std::runtime_error("Modulo by zero");
-        auto b = std::make_shared<int64_t>(getInt64(*this) % db);
+        auto b = std::make_shared<BigInt>(getBigInt(*this) % db);
         registerBigInt(b);
         return Value(b.get());
     }
@@ -706,7 +707,7 @@ Value Value::operator%(const Value& other) const {
         double da = asNumber();
         double res = std::fmod(da, db);
         if (needsPromotion(da, db, res)) {
-            auto b = std::make_shared<int64_t>((int64_t)da % (int64_t)db);
+            auto b = std::make_shared<BigInt>(BigInt((int64_t)da) % BigInt((int64_t)db));
             registerBigInt(b);
             return Value(b.get());
         }
@@ -717,7 +718,7 @@ Value Value::operator%(const Value& other) const {
 
 Value Value::operator-() const {
     if (isBigInt()) {
-        auto b = std::make_shared<int64_t>(-*asBigInt());
+        auto b = std::make_shared<BigInt>(-*asBigInt());
         registerBigInt(b);
         return Value(b.get());
     }
@@ -733,7 +734,7 @@ Value Value::operator==(const Value& other) const {
     if (isNumber() && other.isNumber()) return Value(asNumber() == other.asNumber());
     if (isBigInt() && other.isBigInt()) return Value(*asBigInt() == *other.asBigInt());
     if ((isBigInt() && other.isNumber()) || (isNumber() && other.isBigInt())) {
-        return Value(getInt64(*this) == getInt64(other));
+        return Value(getBigInt(*this) == getBigInt(other));
     }
     if (isString() && other.isString()) return Value(*asString() == *other.asString());
     if (isRegex() && other.isString()) {
@@ -752,28 +753,28 @@ Value Value::operator==(const Value& other) const {
 Value Value::operator!=(const Value& other) const { return !(*this == other); }
 Value Value::operator<(const Value& other) const {
     if ((isBigInt() || isNumber()) && (other.isBigInt() || other.isNumber())) {
-        if (isBigInt() || other.isBigInt()) return Value(getInt64(*this) < getInt64(other));
+        if (isBigInt() || other.isBigInt()) return Value(getBigInt(*this) < getBigInt(other));
         return Value(asNumber() < other.asNumber());
     }
     return Value(false);
 }
 Value Value::operator<=(const Value& other) const {
     if ((isBigInt() || isNumber()) && (other.isBigInt() || other.isNumber())) {
-        if (isBigInt() || other.isBigInt()) return Value(getInt64(*this) <= getInt64(other));
+        if (isBigInt() || other.isBigInt()) return Value(getBigInt(*this) <= getBigInt(other));
         return Value(asNumber() <= other.asNumber());
     }
     return Value(false);
 }
 Value Value::operator>(const Value& other) const {
     if ((isBigInt() || isNumber()) && (other.isBigInt() || other.isNumber())) {
-        if (isBigInt() || other.isBigInt()) return Value(getInt64(*this) > getInt64(other));
+        if (isBigInt() || other.isBigInt()) return Value(getBigInt(*this) > getBigInt(other));
         return Value(asNumber() > other.asNumber());
     }
     return Value(false);
 }
 Value Value::operator>=(const Value& other) const {
     if ((isBigInt() || isNumber()) && (other.isBigInt() || other.isNumber())) {
-        if (isBigInt() || other.isBigInt()) return Value(getInt64(*this) >= getInt64(other));
+        if (isBigInt() || other.isBigInt()) return Value(getBigInt(*this) >= getBigInt(other));
         return Value(asNumber() >= other.asNumber());
     }
     return Value(false);

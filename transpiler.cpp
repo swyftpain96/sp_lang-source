@@ -717,7 +717,7 @@ std::string Transpiler::generateExpression(Expression *expr,
     return "Value(Type::NULL_VAL)";
   }
   if (auto e = dynamic_cast<BigIntLiteralExpression *>(expr)) {
-    return "Value(new int64_t(" + e->value + "))";
+    return "Value(new BigInt(\"" + e->value + "\"))";
   }
   if (auto e = dynamic_cast<IdentifierExpression *>(expr)) {
     return "sp_" + e->name;
