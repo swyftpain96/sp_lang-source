@@ -18,9 +18,11 @@ jobs:
           - os: ubuntu-latest
             artifact_name: sp-linux
             ldflags: "-static"
+
           - os: macos-latest
             artifact_name: sp-macos
             ldflags: ""
+
           - os: windows-latest
             artifact_name: sp-windows
             ldflags: "-static"
@@ -29,30 +31,43 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # ---------------- LINUX ----------------
       - name: Setup Build Environment (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential libboost-all-dev
 
+      # ---------------- MACOS ----------------
+      - name: Setup Build Environment (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew update
+          brew install boost
+
+      # ---------------- WINDOWS ----------------
       - name: Setup Build Environment (Windows)
         if: matrix.os == 'windows-latest'
         uses: msys2/setup-msys2@v2
         with:
           install: |
             mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-boost
             make
           update: false
 
+      # ---------------- BUILD (Linux/macOS) ----------------
       - name: Build (Linux/macOS)
         if: matrix.os != 'windows-latest'
         run: make LDFLAGS="${{ matrix.ldflags }}"
 
+      # ---------------- BUILD (Windows) ----------------
       - name: Build (Windows)
         if: matrix.os == 'windows-latest'
         shell: msys2 {0}
         run: make CXX=g++ CXXFLAGS="-std=c++17 -Wall -Wextra -O3 -flto=auto" LDFLAGS="${{ matrix.ldflags }}"
 
+      # ---------------- ARTIFACT PREP ----------------
       - name: Prepare Binary for Artifact
         shell: bash
         run: |
@@ -64,6 +79,7 @@ jobs:
             mv sp sp-macos
           fi
 
+      # ---------------- UPLOAD ----------------
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
