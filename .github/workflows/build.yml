@@ -59,15 +59,23 @@ jobs:
       # ---------------- BUILD (Linux/macOS) ----------------
       - name: Build (Linux/macOS)
         if: matrix.os != 'windows-latest'
-        run: make LDFLAGS="${{ matrix.ldflags }}"
+        run: |
+          if [ "${{ matrix.os }}" == "macos-latest" ]; then
+            export CPPFLAGS="-I$(brew --prefix boost)/include"
+            export LDFLAGS="-L$(brew --prefix boost)/lib ${{ matrix.ldflags }}"
+          fi
+          make CXXFLAGS="-std=c++17 -Wall -Wextra -O3 -flto=auto" LDFLAGS="${{ matrix.ldflags }}"
 
       # ---------------- BUILD (Windows) ----------------
       - name: Build (Windows)
         if: matrix.os == 'windows-latest'
         shell: msys2 {0}
-        run: make CXX=g++ CXXFLAGS="-std=c++17 -Wall -Wextra -O3 -flto=auto" LDFLAGS="${{ matrix.ldflags }}"
+        run: |
+          make CXX=g++ \
+               CXXFLAGS="-std=c++17 -Wall -Wextra -O3 -flto=auto" \
+               LDFLAGS="${{ matrix.ldflags }}"
 
-      # ---------------- ARTIFACT PREP ----------------
+      # ---------------- PREPARE ARTIFACT ----------------
       - name: Prepare Binary for Artifact
         shell: bash
         run: |
@@ -79,7 +87,7 @@ jobs:
             mv sp sp-macos
           fi
 
-      # ---------------- UPLOAD ----------------
+      # ---------------- UPLOAD ARTIFACT ----------------
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -91,6 +99,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
     permissions:
       contents: write
 
