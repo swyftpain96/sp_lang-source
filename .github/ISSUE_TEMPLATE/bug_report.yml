@@ -1,0 +1,66 @@
+name: 🐛 Bug Report
+description: Report a bug to help improve SP.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: whats-happening
+    attributes:
+      label: What is happening?
+      description: |
+        Explain the bug you encountered.
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction Steps
+      description: |
+        Provide a minimal script or steps to reproduce the bug.
+      placeholder: |
+        // Example:
+        var x = 1.0
+        match x {
+          ...
+        }
+    validations:
+      required: true
+  - type: input
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: |
+        What did you expect to happen?
+    validations:
+      required: true
+  - type: input
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: |
+        What actually happened?
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment Info
+      description: |
+        OS version, SP version, etc.
+      placeholder: |
+        OS: Linux
+        SP Version: 0.1.4
+    validations:
+      required: false
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our Code of Conduct.
+      options:
+        - label: I agree to follow this project's Code of Conduct.
+          required: true

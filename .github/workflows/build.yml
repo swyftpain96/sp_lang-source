@@ -1,0 +1,99 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: sp-linux
+            ldflags: "-static"
+          - os: macos-latest
+            artifact_name: sp-macos
+            ldflags: ""
+          - os: windows-latest
+            artifact_name: sp-windows
+            ldflags: "-static"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Build Environment (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
+
+      - name: Setup Build Environment (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: msys2/setup-msys2@v2
+        with:
+          install: |
+            mingw-w64-x86_64-toolchain
+            make
+          update: false
+
+      - name: Build (Linux/macOS)
+        if: matrix.os != 'windows-latest'
+        run: make LDFLAGS="${{ matrix.ldflags }}"
+
+      - name: Build (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: msys2 {0}
+        run: make CXX=g++ CXXFLAGS="-std=c++17 -Wall -Wextra -O3 -flto=auto" LDFLAGS="${{ matrix.ldflags }}"
+
+      - name: Prepare Binary for Artifact
+        shell: bash
+        run: |
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            mv sp.exe sp-windows.exe
+          elif [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+            mv sp sp-linux
+          else
+            mv sp sp-macos
+          fi
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_name }}*
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: bin
+          merge-multiple: true
+
+      - name: Create or Update "Latest" Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest Release
+          body: "Continuous build of SP programming language binaries for Linux, macOS, and Windows."
+          draft: false
+          prerelease: false
+          files: |
+            bin/sp-linux
+            bin/sp-macos
+            bin/sp-windows.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

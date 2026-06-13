@@ -1,0 +1,34 @@
+In file included from ast.h:4,
+                 from parser.h:5,
+                 from main.cpp:10:
+types.h: In member function ‘Value Value::operator==(const Value&) const’:
+types.h:266:42: error: invalid use of incomplete type ‘struct FutureData’
+  266 |         if (isFuture()) return asFuture()->get() == other;
+      |                                          ^~
+types.h:73:40: note: forward declaration of ‘struct FutureData’
+   73 |     std::vector<std::shared_ptr<struct FutureData>> allFutures;
+      |                                        ^~~~~~~~~~
+types.h:267:63: error: invalid use of incomplete type ‘struct FutureData’
+  267 |         if (other.isFuture()) return *this == other.asFuture()->get();
+      |                                                               ^~
+types.h:73:40: note: forward declaration of ‘struct FutureData’
+   73 |     std::vector<std::shared_ptr<struct FutureData>> allFutures;
+      |                                        ^~~~~~~~~~
+ast.h: In constructor ‘LambdaExpression::LambdaExpression(std::vector<std::pair<std::__cxx11::basic_string<char>, TypeAnnotation> >, std::shared_ptr<Expression>, bool, TypeAnnotation)’:
+ast.h:406:10: warning: ‘LambdaExpression::hasRest’ will be initialized after [-Wreorder]
+  406 |     bool hasRest = false;
+      |          ^~~~~~~
+ast.h:403:20: warning:   ‘TypeAnnotation LambdaExpression::returnType’ [-Wreorder]
+  403 |     TypeAnnotation returnType;
+      |                    ^~~~~~~~~~
+ast.h:407:5: warning:   when initialized here [-Wreorder]
+  407 |     LambdaExpression(std::vector<std::pair<std::string, TypeAnnotation>> p, std::shared_ptr<Expression> b, bool r, TypeAnnotation ret = TypeAnnotation())
+      |     ^~~~~~~~~~~~~~~~
+main.cpp: In lambda function:
+main.cpp:122:74: warning: unused parameter ‘interp’ [-Wunused-parameter]
+  122 |         auto timeFunc = std::make_shared<NativeFunction>([](Interpreter& interp, const std::vector<Value>&) {
+      |                                                             ~~~~~~~~~~~~~^~~~~~
+main.cpp: In lambda function:
+main.cpp:131:75: warning: unused parameter ‘interp’ [-Wunused-parameter]
+  131 |         auto errorFunc = std::make_shared<NativeFunction>([](Interpreter& interp, const std::vector<Value>& args) {
+      |                                                              ~~~~~~~~~~~~~^~~~~~

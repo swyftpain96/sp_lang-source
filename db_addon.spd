@@ -1,0 +1,20 @@
+// db_addon.spd - Type definitions for a 3rd party SQLite native addon
+
+layout UserProfile {
+    id: number
+    name: string
+    email: string
+    is_admin: boolean
+}
+
+// We use type annotations on the declaration. 
+// The implementation body (after =>) can be a mock or empty.
+export define db_open(path: string): { query: (sql: string) => Array<UserProfile>, execute: (sql: string) => boolean, close: () => void } => {
+    return {
+        query: (sql: string) => [],
+        execute: (sql: string) => true,
+        close: () => {}
+    }
+}
+
+export define get_version() => "1.0.0"

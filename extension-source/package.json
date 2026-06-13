@@ -1,0 +1,66 @@
+{
+  "name": "sp-language-vscode",
+  "displayName": "SP Language",
+  "description": "Syntax highlighting, IntelliSense, and basic type inference for the SP language.",
+  "version": "0.1.7",
+  "publisher": "your-name",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-name/sp-language-vscode"
+  },
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:sp"
+  ],
+  "main": "./out/src/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "sp",
+        "aliases": [
+          "SP",
+          "sp"
+        ],
+        "extensions": [
+          ".sp",
+          ".spd"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "sp",
+        "scopeName": "source.sp",
+        "path": "./syntaxes/sp.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "sp",
+        "path": "./snippets/sp.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -w -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.70.0"
+  },
+  "dependencies": {
+    "typescript": "^5.9.3",
+    "vscode-languageclient": "^9.0.1",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.0",
+    "vscode-uri": "^3.1.0"
+  }
+}

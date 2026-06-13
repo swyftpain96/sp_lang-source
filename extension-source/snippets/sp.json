@@ -1,0 +1,165 @@
+{
+  "HTTP Server": {
+    "prefix": "http.serve",
+    "body": [
+      "http.serve(${1:8080}, (req) => {",
+      "\tconsole.show(\"Request: \" + req.method + \" \" + req.path)",
+      "\treturn {",
+      "\t\tstatus: 200,",
+      "\t\tbody: { message: \"Hello from SP!\" }",
+      "\t}",
+      "})$0"
+    ],
+    "description": "Create a new HTTP server"
+  },
+  "Async Task": {
+    "prefix": "async",
+    "body": [
+      "async {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Create a background async task"
+  },
+  "Fetch JSON": {
+    "prefix": "net.get",
+    "body": [
+      "set res = net.get(\"${1:https://api.example.com}\")",
+      "if (res.status == 200) {",
+      "\tset data = res.json()",
+      "\t$0",
+      "}"
+    ],
+    "description": "Fetch and parse JSON from a URL"
+  },
+  "After Timer": {
+    "prefix": "after",
+    "body": [
+      "after ${1:1000} {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Execute code after a delay (milliseconds)"
+  },
+  "Repeating Timer": {
+    "prefix": "every",
+    "body": [
+      "set timer = every ${1:1000} {",
+      "\t$0",
+      "}",
+      "// timer.stop() to cancel"
+    ],
+    "description": "Execute code repeatedly at intervals (milliseconds)"
+  },
+  "Process Sleep": {
+    "prefix": "process.sleep",
+    "body": [
+      "process.sleep(${1:1000})"
+    ],
+    "description": "Synchronously delay execution (milliseconds)"
+  },
+  "Print to console": {
+    "prefix": "print",
+    "body": [
+      "print $1"
+    ],
+    "description": "Log output to console"
+  },
+  "Array map": {
+    "prefix": "map",
+    "body": [
+      "map((${1:item}) => {",
+      "\t$0",
+      "})"
+    ],
+    "description": "Array map method"
+  },
+  "Array filter": {
+    "prefix": "filter",
+    "body": [
+      "filter((${1:item}) => {",
+      "\t$0",
+      "})"
+    ],
+    "description": "Array filter method"
+  },
+  "Array forEach": {
+    "prefix": "forEach",
+    "body": [
+      "forEach((${1:item}) => {",
+      "\t$0",
+      "})"
+    ],
+    "description": "Array forEach method"
+  },
+  "Error Handler": {
+    "prefix": "error",
+    "body": [
+      "error((${1:e}) => {",
+      "\tconsole.show(\"Error: \", ${1:e})",
+      "\t$0",
+      "})"
+    ],
+    "description": "Chainable error handler"
+  },
+  "Destructure Error": {
+    "prefix": "destruct",
+    "body": [
+      "var [${1:res}, ${2:err}] = ${3:expression}",
+      "if (${2:err}) {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Destructure a value into [result, error]"
+  },
+  "SQLite Open": {
+    "prefix": "sqlite.open",
+    "body": [
+      "set db = sqlite.open(\"${1:data.db}\")",
+      "$0",
+      "db.close()"
+    ],
+    "description": "Open a SQLite database connection"
+  },
+  "SQLite Query": {
+    "prefix": "db.query",
+    "body": [
+      "set rows = db.query(\"${1:SELECT * FROM table WHERE id = ?}\", ${2:id})",
+      "for ${3:row} in rows {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Run a SQLite query and iterate over rows"
+  },
+  "SQLite Execute": {
+    "prefix": "db.execute",
+    "body": [
+      "set changes = db.execute(\"${1:INSERT INTO table (col) VALUES (?)}\", ${2:val})",
+      "console.show(\"Rows affected: \", changes)$0"
+    ],
+    "description": "Execute a non-query SQLite statement"
+  },
+  "Storage Get": {
+    "prefix": "storage.getItem",
+    "body": [
+      "set ${1:val} = storage.getItem(\"${2:key}\")",
+      "$0"
+    ],
+    "description": "Get item from async storage"
+  },
+  "Storage Set": {
+    "prefix": "storage.setItem",
+    "body": [
+      "storage.setItem(\"${1:key}\", ${2:value})",
+      "$0"
+    ],
+    "description": "Set item in async storage"
+  },
+  "Type Check": {
+    "prefix": "typeof",
+    "body": [
+      "typeof $1"
+    ],
+    "description": "Returns the runtime type of an expression as a string"
+  }
+}

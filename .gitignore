@@ -1,0 +1,46 @@
+# Build artifacts
+sp
+sp_interpreter
+sp_test_bin
+out
+out_bin
+out_aot
+*.o
+*.so
+*.dll
+*.exe
+
+# Logs
+*.log
+output.txt
+output_vm.txt
+
+# Temporary/Generic test files
+test.sp
+repro.sp
+repro_greet.sp
+experiment.sp
+simple.sp
+
+# Temporary/Data files
+out.cpp
+spawned_file.txt
+data.output.json
+data.test.json
+test_json_data.json
+test_json_debug.log
+test_json_run.log
+
+# VS Code
+.vscode/
+*.vsix
+node_modules/
+sp_dist/
+sp-language-vscode-0.1.4.vsix
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Large test files
+test_stability.log

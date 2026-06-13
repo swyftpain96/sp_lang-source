@@ -1,0 +1,19 @@
+# TypeScript source — only the compiled out/ is needed at runtime
+src/**/*.ts
+server/src/**/*.ts
+tsconfig.json
+
+# Dev-only node_modules (pnpm stores them in .pnpm)
+node_modules/.pnpm
+node_modules/.modules.yaml
+node_modules/.package-lock.json
+
+# Lock files and package manager metadata
+pnpm-lock.yaml
+package-lock.yaml
+yarn.lock
+.pnpmfile.cjs
+
+# Misc
+.vscode-test/
+*.vsix

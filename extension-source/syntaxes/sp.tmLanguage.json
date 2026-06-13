@@ -1,0 +1,317 @@
+{
+  "scopeName": "source.sp",
+  "name": "SP",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#console_call" },
+    { "include": "#fs_call" },
+    { "include": "#date_call" },
+    { "include": "#map_call" },
+    { "include": "#regex_call" },
+    { "include": "#net_call" },
+    { "include": "#process_call" },
+    { "include": "#sqlite_call" },
+    { "include": "#storage_call" },
+    { "include": "#json_call" },
+    { "include": "#string_call" },
+    { "include": "#member_access" },
+    { "include": "#member_property" },
+    { "include": "#object_access_prefix" },
+    { "include": "#object_key" },
+    { "include": "#class_declaration" },
+    { "include": "#layout_declaration" },
+    { "include": "#use_statement" },
+    { "include": "#define_declaration" },
+    { "include": "#set_declaration" },
+    { "include": "#var_declaration" },
+    { "include": "#control_keywords" },
+    { "include": "#declaration_keywords" },
+    { "include": "#literals" },
+    { "include": "#type_annotation" },
+    { "include": "#builtins" },
+    { "include": "#typeof_operator" },
+    { "include": "#operators" },
+    { "include": "#function_call" },
+    { "include": "#punctuation" },
+    { "include": "#identifiers" }
+  ],
+  "repository": {
+    "builtins": {
+      "name": "support.class.builtin.sp",
+      "match": "\\b(time|floor|range|Error|Date|Map|HashMap|Regex|Future|Timer|sqlite|storage|JSON)\\b"
+    },
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.sp",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.documentation.sp",
+          "begin": "/\\*\\*",
+          "end": "\\*/"
+        },
+        {
+          "name": "comment.block.sp",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.sp",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        { "name": "constant.character.escape.sp", "match": "\\\\." }
+      ]
+    },
+    "numbers": {
+      "name": "constant.numeric.sp",
+      "match": "\\b\\d+(\\.\\d+)?n?\\b"
+    },
+    "literals": {
+      "patterns": [
+        {
+          "name": "constant.language.boolean.sp",
+          "match": "\\b(true|false)\\b"
+        },
+        {
+          "name": "constant.language.null.sp",
+          "match": "\\b(null|undefined|this)\\b"
+        }
+      ]
+    },
+    "console_call": {
+      "comment": "Highlights console.show(...) — console in yellow, show in a different yellow",
+      "match": "\\b(console)(\\.)(show|warn|args|read)\\b",
+      "captures": {
+        "1": { "name": "support.class.sp" },
+        "2": { "name": "punctuation.accessor.sp" },
+        "3": { "name": "entity.name.function.member.sp" }
+      }
+    },
+    "fs_call": {
+      "comment": "Highlights fs.create(...) — fs in yellow, method in a different yellow",
+      "match": "\\b(fs)(\\.)(create|overwrite|append|delete|read|path|dirname|name|ext|info)\\b",
+      "captures": {
+        "1": { "name": "support.class.sp" },
+        "2": { "name": "punctuation.accessor.sp" },
+        "3": { "name": "entity.name.function.member.sp" }
+      }
+    },
+    "date_call": {
+      "comment": "Highlights Date.now(...) — Date in yellow, method in a different yellow",
+      "match": "\\b(Date)(\\.)(now|parse|year|month|day|hour|minute|second|toString)\\b",
+      "captures": {
+        "1": { "name": "support.class.sp" },
+        "2": { "name": "punctuation.accessor.sp" },
+        "3": { "name": "entity.name.function.member.sp" }
+      }
+    },
+    "map_call": {
+      "comment": "Highlights Map.set(...) — Map in yellow, method in a different yellow",
+      "match": "\\b(Map|HashMap)(\\.)(set|get|has|delete|clear|size|keys|values|forEach)\\b",
+      "captures": {
+        "1": { "name": "support.class.sp" },
+        "2": { "name": "punctuation.accessor.sp" },
+        "3": { "name": "entity.name.function.member.sp" }
+      }
+    },
+    "net_call": {
+      "comment": "Highlights net.get(...) and http.serve(...) — net/http in yellow, method in a different yellow",
+      "match": "\\b(net|http)(\\.)(get|post|serve)\\b",
+      "captures": {
+        "1": { "name": "support.class.sp" },
+        "2": { "name": "punctuation.accessor.sp" },
+        "3": { "name": "entity.name.function.member.sp" }
+      }
+    },
+    "regex_call": {
+      "comment": "Highlights regex.digit(...) — regex in yellow, method in a different yellow",
+      "match": "\\b(regex|Regex)(\\.)(digit|nonDigit|word|letter|whitespace|any|start|end|wordBoundary|text|range|repeat|repeatAtLeast|repeatBetween|maybe|optional|oneOrMore|zeroOrMore|group|capture|or|test|match)\\b",
+      "captures": {
+        "1": { "name": "support.class.sp" },
+        "2": { "name": "punctuation.accessor.sp" },
+        "3": { "name": "entity.name.function.member.sp" }
+      }
+    },
+    "process_call": {
+      "comment": "Highlights process.run(...) — process in yellow, method in a different yellow",
+      "match": "\\b(process)(\\.)(run|spawn|sleep)\\b",
+      "captures": {
+        "1": { "name": "support.class.sp" },
+        "2": { "name": "punctuation.accessor.sp" },
+        "3": { "name": "entity.name.function.member.sp" }
+      }
+    },
+    "sqlite_call": {
+      "comment": "Highlights sqlite.open(...) — sqlite in yellow, method in a different yellow",
+      "match": "\\b(sqlite)(\\.)(open)\\b",
+      "captures": {
+        "1": { "name": "support.class.sp" },
+        "2": { "name": "punctuation.accessor.sp" },
+        "3": { "name": "entity.name.function.member.sp" }
+      }
+    },
+    "storage_call": {
+      "comment": "Highlights storage.getItem(...) — storage in yellow, method in a different yellow",
+      "match": "\\b(storage)(\\.)(setItem|getItem|removeItem|clear)\\b",
+      "captures": {
+        "1": { "name": "support.class.sp" },
+        "2": { "name": "punctuation.accessor.sp" },
+        "3": { "name": "entity.name.function.member.sp" }
+      }
+    },
+    "json_call": {
+      "comment": "Highlights JSON.stringify(...) — JSON in yellow, method in a different yellow",
+      "match": "\\b(JSON)(\\.)(stringify|parse)\\b",
+      "captures": {
+        "1": { "name": "support.class.sp" },
+        "2": { "name": "punctuation.accessor.sp" },
+        "3": { "name": "entity.name.function.member.sp" }
+      }
+    },
+    "member_access": {
+      "comment": "Highlights module.method — method in function color",
+      "match": "(\\.)([a-zA-Z_][a-zA-Z0-9_]*)(?=\\s*\\()",
+      "captures": {
+        "1": { "name": "punctuation.accessor.sp" },
+        "2": { "name": "entity.name.function.sp" }
+      }
+    },
+    "member_property": {
+      "comment": "Highlights .property — property in variable color",
+      "match": "(\\.)([a-zA-Z_][a-zA-Z0-9_]*)\\b(?![\\s]*[\\(])",
+      "captures": {
+        "1": { "name": "punctuation.accessor.sp" },
+        "2": { "name": "variable.other.property.sp" }
+      }
+    },
+    "object_access_prefix": {
+      "comment": "Highlights the 'obj' in 'obj.prop' — object name in namespace/class color",
+      "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b(?=\\s*\\.)",
+      "captures": {
+        "1": { "name": "entity.name.namespace.sp" }
+      }
+    },
+    "object_key": {
+      "comment": "Highlights object literal keys (e.g. { a: 1 })",
+      "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b\\s*:(?!\\s*[a-zA-Z_])",
+      "captures": {
+        "1": { "name": "variable.other.property.sp" }
+      }
+    },
+    "type_annotation": {
+      "patterns": [
+        {
+          "match": "(:)\\s*([a-zA-Z_][a-zA-Z0-9_]*(?:\\.[a-zA-Z_][a-zA-Z0-9_]*)*)",
+          "captures": {
+            "1": { "name": "punctuation.separator.type.sp" },
+            "2": { "name": "support.type.sp" }
+          }
+        },
+        {
+          "match": "\\b(string|number|boolean|bool|any|void|Error|Date|Map|HashMap|Regex|Future|Timer)\\b",
+          "name": "support.type.sp"
+        },
+        {
+          "match": "<|>",
+          "name": "punctuation.bracket.angle.sp"
+        },
+        {
+          "match": "\\||&",
+          "name": "keyword.operator.type.sp"
+        }
+      ]
+    },
+    "use_statement": {
+      "comment": "Highlights: use moduleName",
+      "match": "\\b(use)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\b",
+      "captures": {
+        "1": { "name": "keyword.declaration.sp" },
+        "2": { "name": "entity.name.namespace.sp" }
+      }
+    },
+    "define_declaration": {
+      "comment": "Highlights: [export] [private] define functionName",
+      "match": "\\b(export\\s+)?(private\\s+)?(define)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\b",
+      "captures": {
+        "1": { "name": "keyword.declaration.sp" },
+        "2": { "name": "keyword.declaration.sp" },
+        "3": { "name": "keyword.declaration.sp" },
+        "4": { "name": "entity.name.function.sp" }
+      }
+    },
+    "class_declaration": {
+      "comment": "Highlights: [export] [abstract] class ClassName",
+      "match": "\\b(export\\s+)?(abstract\\s+)?(class)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\b",
+      "captures": {
+        "1": { "name": "keyword.declaration.sp" },
+        "2": { "name": "keyword.declaration.sp" },
+        "3": { "name": "keyword.declaration.sp" },
+        "4": { "name": "entity.name.class.sp" }
+      }
+    },
+    "layout_declaration": {
+      "comment": "Highlights: [export] layout LayoutName",
+      "match": "\\b(export\\s+)?(layout)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\b",
+      "captures": {
+        "1": { "name": "keyword.declaration.sp" },
+        "2": { "name": "keyword.declaration.sp" },
+        "3": { "name": "entity.name.type.sp" }
+      }
+    },
+    "set_declaration": {
+      "comment": "Highlights: [readonly] [private] set variableName",
+      "match": "\\b((readonly|private)\\s+)*(set)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\b",
+      "captures": {
+        "2": { "name": "keyword.declaration.sp" },
+        "3": { "name": "keyword.declaration.sp" },
+        "4": { "name": "entity.name.variable.sp" }
+      }
+    },
+    "var_declaration": {
+      "comment": "Highlights: [private] var variableName",
+      "match": "\\b(private\\s+)?(var)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\b",
+      "captures": {
+        "1": { "name": "keyword.declaration.sp" },
+        "2": { "name": "keyword.declaration.sp" },
+        "3": { "name": "entity.name.variable.sp" }
+      }
+    },
+    "control_keywords": {
+      "name": "keyword.control.sp",
+      "match": "\\b(if|else|return|match|default|while|for|in|async|after|every)\\b"
+    },
+    "declaration_keywords": {
+      "name": "keyword.declaration.sp",
+      "match": "\\b(layout|set|var|define|use|export|as|from|args|read|class|abstract|private|readonly|this|process|run|spawn|fs|create|overwrite|append|delete|string|trim|size|length|path|dirname|Date|Map|HashMap|regex|Regex|sqlite|storage|JSON)\\b"
+    },
+    "operators": {
+      "name": "keyword.operator.sp",
+      "match": "(=>|==|!=|<=|>=|&&|&|\\|>|\\|\\||[+\\-*\\/!<>=])"
+    },
+    "punctuation": {
+      "name": "punctuation.separator.sp",
+      "match": "[\\{\\}\\[\\]\\(\\)\\,\\:\\.]"
+    },
+    "function_call": {
+      "comment": "Highlights any identifier used as a function call, e.g. fib(...), including recursive calls",
+      "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)(?=\\s*\\()",
+      "captures": {
+        "1": { "name": "entity.name.function.sp" }
+      }
+    },
+    "identifiers": {
+      "name": "variable.other.sp",
+      "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
+    },
+    "typeof_operator": {
+      "name": "keyword.operator.expression.typeof.sp",
+      "match": "\\btypeof\\b"
+    }
+  }
+}
